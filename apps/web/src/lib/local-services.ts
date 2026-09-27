@@ -1,19 +1,22 @@
 import type { AppServices, AuthSession } from '../../../../packages/shared/src/auth';
 import { createHttpProfileService } from './profile-service';
 
-export async function localRequest(path: string, options: RequestInit = {}) {
+export async function localRequest<T = unknown>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`/api/dev/${path}`, { ...options, credentials: 'same-origin', headers: { 'Content-Type': 'application/json', ...options.headers } });
-  if (!response.ok) throw new Error('The local API request failed. Make sure npm run dev is running.');
-  return response.json();
+  const result = await response.json().catch(() => null) as { error?: unknown } | null;
+  if (!response.ok) {
+    throw new Error(typeof result?.error === 'string' ? result.error : 'The local API request failed. Make sure npm run dev is running.');
+  }
+  return result as T;
 }
 export function createLocalServices(): AppServices {
   const listeners = new Set<(session: AuthSession | null) => void>();
   return {
     auth: {
       mode: 'demo', requiresPassword: false,
-      getSession: () => localRequest('session'),
+      getSession: () => localRequest<AuthSession | null>('session'),
       async authenticate({ email }) {
-        const session: AuthSession = await localRequest('session', { method: 'POST', body: JSON.stringify({ email }) });
+        const session = await localRequest<AuthSession>('session', { method: 'POST', body: JSON.stringify({ email }) });
         listeners.forEach(listener => listener(session));
         return { status: 'authenticated', session };
       },

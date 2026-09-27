@@ -1,6 +1,6 @@
-import type { User } from "../profiles/Profile";
-import { Group, type MatchType } from "./Group";
-import { MatchQueue } from "./queue";
+import type { User } from "../profiles/Profile.js";
+import { Group, type MatchType } from "./Group.js";
+import { MatchQueue } from "./queue.js";
 
 /** In-memory collection of groups. In production, use the groups database table. */
 export class Groups {

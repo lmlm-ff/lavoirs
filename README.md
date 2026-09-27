@@ -30,7 +30,7 @@ A working frontend demo and integration scaffold for a small-group, interest-bas
 - `apps/web/src/lib/livekit-client.ts` — browser-side LiveKit connection boundary.
 - `apps/web/src/features/room/` — room UI, participant grid, media controls, prompts, voting, and transcription consent.
 
-The login, profile, matching demo, room preview, and frontend configuration are implemented. See INTEGRATION.md for setup and teammate handoff details. Other backend files remain placeholders.
+The login, profile, local in-memory matching flow, room preview, and frontend configuration are implemented. See INTEGRATION.md for setup and integration boundaries. The local queue and groups are not yet persisted to Supabase.
 
 ## File-by-file roles
 

@@ -1,4 +1,4 @@
-import type { Group } from "./Group";
+import type { Group } from "./Group.js";
 
 /** Small adapter boundary so the generator can work with any LLM provider. */
 export interface TextGenerationClient {

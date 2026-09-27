@@ -12,9 +12,10 @@ import { requestRoomToken } from '../../lib/livekit-client.js';
 interface Props {
     groupId: string;
     user: GroupMember;
+    onLeave: () => void;
 }
 
-export function LiveKitRoom({ groupId, user }: Props) {
+export function LiveKitRoom({ groupId, user, onLeave }: Props) {
     const [room, setRoom] = useState<LiveKitClientRoom | null>(null);
     const [participants, setParticipants] = useState<Participant[]>([]);
     const [connecting, setConnecting] = useState(false);
@@ -115,6 +116,7 @@ export function LiveKitRoom({ groupId, user }: Props) {
         setMicOn(false);
         setCameraOn(false);
         setMessage('You left the room. Rejoin whenever you are ready.');
+        onLeave();
     }
 
     async function toggleMicrophone() {

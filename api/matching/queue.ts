@@ -1,4 +1,4 @@
-import type { User } from "../profiles/Profile";
+import type { User } from "../profiles/Profile.js";
 
 /** Users waiting to be grouped, plus the matching policy for this queue. */
 export class MatchQueue {
@@ -49,6 +49,15 @@ export class MatchQueue {
   /** Return a snapshot of IDs, not the internal user array. */
   getWaitingUserIds(): string[] {
     return this.users.map((user) => user.id);
+  }
+
+  /** Count only other queued users who overlap interests and fit the radius. */
+  countCompatible(user: User): number {
+    return this.users.filter((candidate) =>
+      candidate.id !== user.id &&
+      candidate.interests.some((interest) => user.interests.includes(interest)) &&
+      this.areNearby(user, candidate),
+    ).length;
   }
 
   /**
@@ -137,7 +146,7 @@ export class MatchQueue {
   }
 
   private areNearby(a: User, b: User): boolean {
-    return this.distanceKm(a, b) <= this.maxDistanceKm;
+    return this.distanceKm(a, b) <= Math.min(this.maxDistanceKm, a.radiusKm, b.radiusKm);
   }
 
   private distanceKm(a: User, b: User): number {

@@ -11,6 +11,7 @@ export interface UserOptions {
   hobbies?: string[];
   interests?: string[];
   location: UserLocation;
+  radiusKm?: number;
   inQueue?: boolean;
   groupId?: string | null;
 }
@@ -23,6 +24,7 @@ export class User {
   interests: string[]; // interests used for matching in each session
   
   location: UserLocation;
+  radiusKm: number;
   inQueue: boolean;
   groupId: string | null;
 
@@ -34,12 +36,16 @@ export class User {
     if (!Number.isFinite(options.location.longitude) || options.location.longitude < -180 || options.location.longitude > 180) {
       throw new Error("Longitude must be between -180 and 180");
     }
+    if (!Number.isFinite(options.radiusKm ?? 50) || (options.radiusKm ?? 50) <= 0) {
+      throw new Error("Radius must be a positive number of kilometers");
+    }
 
     this.id = options.id;
     this.name = options.name;
     this.hobbies = [...(options.hobbies ?? [])];
     this.interests = [...(options.interests ?? [])];
     this.location = { ...options.location };
+    this.radiusKm = options.radiusKm ?? 50;
     this.inQueue = options.inQueue ?? false;
     this.groupId = options.groupId ?? null;
   }

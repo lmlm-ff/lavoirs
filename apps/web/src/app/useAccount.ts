@@ -48,7 +48,7 @@ export function useAccount(services: AppServices, onProfile: (profile: Profile |
       const result = await services.auth.authenticate(input);
       if (result.status === 'pending') setNotice(result.message);
       else await receiveRef.current(result.session);
-    } catch { setError('Unable to sign in. Check your details and try again.'); }
+    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to sign in. Check your details and try again.'); }
     finally { if (before === revision.current) setBusy(false); }
   }
   async function logout() {

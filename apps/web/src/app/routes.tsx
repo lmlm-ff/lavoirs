@@ -10,6 +10,7 @@ import MatchingPage from '../features/matching/MatchingPage';
 import RoomPage from '../features/room/RoomPage';
 import EventRecommendations from '../features/events/EventRecommendations';
 import HomePage from '../features/home/HomePage';
+import { localRequest } from '../lib/local-services';
 
 interface Props {
   services: AppServices;
@@ -47,14 +48,18 @@ export default function AppRoutes({ services, profile, group, setProfile, setGro
     if (complete && !hasCompleteProfile(profile)) return <Navigate to="/profile" replace/>;
     return page;
   }
-  function leaveRoom() { setGroup(null); navigate('/queue', { replace: true }); }
+  async function leaveRoom() {
+    try { await localRequest('group/leave', { method: 'POST' }); } catch { /* Clear stale room state even if the local server has restarted. */ }
+    setGroup(null);
+    navigate('/queue', { replace: true });
+  }
 
   return <Routes>
     <Route path="/" element={profile ? <HomePage nextPath={home}/> : <Navigate to="/login" replace/>}/>
     <Route path="/login" element={profile ? <Navigate to={home} replace/> : <LoginPage key="login" onContinue={account.login} demo={services.auth.mode === 'demo'} requiresPassword={services.auth.requiresPassword}/>}/>
     <Route path="/signup" element={profile ? <Navigate to={home} replace/> : <LoginPage key="signup" signup onContinue={account.login} demo={services.auth.mode === 'demo'} requiresPassword={services.auth.requiresPassword}/>}/>
     <Route path="/profile" element={protect(profile && <ProfilePage profile={profile} onSave={draft => { void account.save(draft, saved => { setProfile(saved); navigate('/queue'); }); }}/>)}/>
-    <Route path="/queue" element={protect(profile && <MatchingPage profile={profile} onEdit={() => navigate('/profile')} onJoin={match => { setGroup(match); navigate(`/rooms/${encodeURIComponent(match.roomId)}`); }}/>, true)}/>
+    <Route path="/queue" element={protect(profile && <MatchingPage profile={profile} onEdit={() => { void localRequest('queue', { method: 'DELETE' }).catch(() => {}); navigate('/profile'); }} onJoin={match => { setGroup(match); navigate(`/rooms/${encodeURIComponent(match.roomId)}`); }}/>, true)}/>
     <Route path="/rooms/:roomId" element={protect(<RoomRoute group={group} profile={profile} onLeave={leaveRoom} onEvents={() => navigate('/events')}/>, true)}/>
     <Route path="/events" element={protect(group ? <EventRecommendations onBackToQueue={leaveRoom}/> : <Navigate to="/queue" replace/>, true)}/>
     <Route path="*" element={<section className="page-content"><div className="eyebrow">WRONG WARP PIPE</div><h1>This page wandered off.</h1><p className="muted">Let’s get you back to your people.</p><Link className="primary" to={home}>Back to the lobby</Link></section>}/>

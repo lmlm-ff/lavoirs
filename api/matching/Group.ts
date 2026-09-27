@@ -1,4 +1,4 @@
-import type { User } from "../profiles/Profile";
+import type { User } from "../profiles/Profile.js";
 
 export type MatchType = "shared-interest" | "nearby";
 
@@ -7,6 +7,7 @@ export class Group {
   readonly memberIds: string[];
   readonly sharedInterests: string[];
   readonly createdAt: Date;
+  icebreakerPrompt: string | null = null;
   status: "active" | "ended" = "active";
 
   constructor(
@@ -42,5 +43,20 @@ export class Group {
     for (const member of this.members) {
       if (member.groupId === this.id) member.groupId = null;
     }
+  }
+
+  setIcebreakerPrompt(prompt: string): void {
+    this.icebreakerPrompt = prompt;
+  }
+
+  removeMember(userId: string): boolean {
+    const index = this.members.findIndex((member) => member.id === userId);
+    if (index < 0) return false;
+    const [member] = this.members.splice(index, 1);
+    this.memberIds.splice(index, 1);
+    if (member.groupId === this.id) member.groupId = null;
+    member.inQueue = false;
+    if (this.members.length === 0) this.end();
+    return true;
   }
 }

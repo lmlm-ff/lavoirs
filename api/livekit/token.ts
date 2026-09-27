@@ -1,5 +1,5 @@
 import { AccessToken } from 'livekit-server-sdk';
-import { readDevSession } from '../../server/dev-sessions.js';
+import { localDevelopment, readDevSession } from '../../server/dev-sessions.js';
 import type { LiveKitTokenRequest, LiveKitTokenResponse } from '../../packages/shared/src/livekit.js';
 
 interface TokenRequest {
@@ -28,11 +28,10 @@ export default async function handler(req: TokenRequest, res: TokenResponseWrite
     return res.status(405).json({ error: 'Use POST to request room access.' });
   }
 
-  // Local sessions are enabled only on this computer in development.
-  // Production must use verified auth and database group membership.
-  const hostHeader = req.headers.host;
-  const localHost = typeof hostHeader === 'string' && /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/i.test(hostHeader);
-  if (process.env.NODE_ENV !== 'development' || process.env.DEV_FAKE_USER_AUTH !== 'true' || !localHost) {
+  // Match the local-only development gate used by the queue API. LAN clients
+  // reach this endpoint through Vite's same-origin proxy during local demos.
+  // Production still requires verified auth and database group membership.
+  if (!localDevelopment(req.headers)) {
     return res.status(503).json({ error: 'Room authentication is not configured.' });
   }
 
