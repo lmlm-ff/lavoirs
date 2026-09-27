@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "gather-livekit-slice",
   "private": true,
   "type": "module",
@@ -35,5 +36,9 @@
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "vite": "^7.1.7"
+=======
+  "devDependencies": {
+    "supabase": "^2.118.0"
+>>>>>>> origin/matching
   }
 }

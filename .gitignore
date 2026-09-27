@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 node_modules/
 dist/
 .env
@@ -6,3 +7,34 @@ dist/
 .tools/
 test-results/
 playwright-report/
+=======
+# Dependencies
+node_modules/
+
+# Build output and caches
+dist/
+build/
+coverage/
+.vite/
+*.tsbuildinfo
+
+# Local environment files; keep the example template tracked
+.env
+.env.*
+!.env.example
+
+# Vercel local settings
+.vercel/
+
+# Package manager logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+>>>>>>> origin/matching
